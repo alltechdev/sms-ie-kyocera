@@ -25,58 +25,53 @@ package com.github.tmo1.sms_ie
 import android.content.Context
 import android.text.format.DateUtils
 import android.util.AttributeSet
-import android.preference.DialogPreference
+import android.preference.Preference
+import android.preference.PreferenceManager
+import android.app.TimePickerDialog
+import android.os.Bundle
+import android.text.format.DateFormat
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import java.util.Formatter
 import java.util.Locale
 
-// from: https://old.black/2020/09/18/building-custom-timepicker-dialog-preference-in-android-kotlin/
-class TimePickerPreference(context: Context, attrs: AttributeSet?) :
-    DialogPreference(context, attrs) {
-
-    init {
-        setPositiveButtonText(android.R.string.ok)
-        setNegativeButtonText(android.R.string.cancel)
-    }
-
-    // Get saved preference value (in minutes from midnight, so 1 AM is represented as 1*60 here
-    fun getPersistedMinutesAfterMidnight(): Int {
-        return super.getPersistedInt(DEFAULT_MINUTES_AFTER_MIDNIGHT)
-    }
-
-    // Save preference
-    fun persistMinutesAfterMidnight(minutesAfterMidnight: Int) {
-        super.persistInt(minutesAfterMidnight)
-        notifyChanged()
-        scheduleAutomaticExport(context, true)
-    }
+class TimePickerPreference(context: Context, attrs: AttributeSet?) : Preference(context, attrs) {
+    fun getPersistedMinutesAfterMidnight(): Int = getPersistedInt(DEFAULT_MINUTES_AFTER_MIDNIGHT)
 
     override fun onSetInitialValue(restorePersistedValue: Boolean, defaultValue: Any?) {
         if (!restorePersistedValue) persistInt((defaultValue as? Int) ?: DEFAULT_MINUTES_AFTER_MIDNIGHT)
         summary = minutesAfterMidnightToHourlyTime(context, getPersistedMinutesAfterMidnight())
     }
 
-    private lateinit var nativeTime: android.widget.TimePicker
-    override fun onCreateDialogView(): android.view.View {
-        nativeTime = android.widget.TimePicker(context)
-        val minutes = getPersistedMinutesAfterMidnight()
-        nativeTime.hour = minutes / 60
-        nativeTime.minute = minutes % 60
-        return nativeTime
-    }
-    override fun onDialogClosed(positiveResult: Boolean) {
-        super.onDialogClosed(positiveResult)
-        if (positiveResult) {
-            val minutes = nativeTime.hour * 60 + nativeTime.minute
-            persistMinutesAfterMidnight(minutes)
-            summary = minutesAfterMidnightToHourlyTime(context, minutes)
-        }
+    override fun onClick() {
+        val host = context as FragmentActivity
+        if (host.supportFragmentManager.findFragmentByTag("native_time_picker") != null) return
+        NativeTimePickerFragment().apply {
+            arguments = Bundle().apply {
+                putString("key", key)
+                putString("title", title.toString())
+                putInt("minutes", getPersistedMinutesAfterMidnight())
+            }
+        }.show(host.supportFragmentManager, "native_time_picker")
     }
 
-    // Mostly for default values
     companion object {
-        // default is 2:00 a.m.
-        private const val DEFAULT_HOUR = 2
-        const val DEFAULT_MINUTES_AFTER_MIDNIGHT = DEFAULT_HOUR * 60
+        const val DEFAULT_MINUTES_AFTER_MIDNIGHT = 120
+    }
+}
+
+class NativeTimePickerFragment : DialogFragment() {
+    override fun onCreateDialog(state: Bundle?): android.app.Dialog {
+        val context = requireContext()
+        val arguments = requireArguments()
+        val key = requireNotNull(arguments.getString("key"))
+        val minutes = arguments.getInt("minutes", TimePickerPreference.DEFAULT_MINUTES_AFTER_MIDNIGHT)
+        return TimePickerDialog(context, { _, hour, minute ->
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(key, hour * 60 + minute).apply()
+            scheduleAutomaticExport(context, true)
+        }, minutes / 60, minutes % 60, DateFormat.is24HourFormat(context)).apply {
+            setTitle(arguments.getString("title"))
+        }
     }
 }
 

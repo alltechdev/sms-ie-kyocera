@@ -195,6 +195,11 @@ class SettingsActivity : KyoceraActivity() {
                         }
                     }
 
+                    "export_time" -> {
+                        val pref = findNativePreference<TimePickerPreference>(key)
+                        pref?.summary = minutesAfterMidnightToHourlyTime(requireContext(), pref.getPersistedMinutesAfterMidnight())
+                    }
+
                     "export_interval_days" -> context?.let {
                         scheduleAutomaticExport(it, true)
                     }
