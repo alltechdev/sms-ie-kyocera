@@ -19,6 +19,7 @@ class KyoceraSoftkeys(window: Window, center: () -> Unit, left: () -> Unit, righ
     private val type = Class.forName("jp.kyocera.kcfp.util.KCfpSoftkeyGuide")
     private val guide = type.getMethod("getSoftkeyGuide", Window::class.java).invoke(null, window)
         ?: error("Kyocera softkey guide unavailable")
+    private val listeners = arrayListOf<Any>()
     init {
         val listener = Class.forName("jp.kyocera.kcfp.util.KCfpSoftkeyGuide\$SoftkeyEventListener")
         listOf(center, left, right).forEachIndexed { index, action ->
@@ -31,15 +32,19 @@ class KyoceraSoftkeys(window: Window, center: () -> Unit, left: () -> Unit, righ
                     else -> null
                 }
             }
+            listeners.add(proxy)
             type.getMethod("setSoftkeyEventListener", Int::class.javaPrimitiveType, listener).invoke(guide, index, proxy)
         }
     }
     fun labels(center: String, left: String, right: String) {
         listOf(center, left, right).forEachIndexed { index, label ->
+            val listener = Class.forName("jp.kyocera.kcfp.util.KCfpSoftkeyGuide\$SoftkeyEventListener")
+            type.getMethod("setSoftkeyEventListener", Int::class.javaPrimitiveType, listener)
+                .invoke(guide, index, if (label == "@SK_AUTO_ENTER" || label.isEmpty()) null else listeners[index])
             type.getMethod("setPriority", Int::class.javaPrimitiveType, Int::class.javaPrimitiveType).invoke(guide, index, 2)
             type.getMethod("setText", Int::class.javaPrimitiveType, CharSequence::class.java).invoke(guide, index, label)
             type.getMethod("setEnabled", Int::class.javaPrimitiveType, Boolean::class.javaPrimitiveType)
-                .invoke(guide, index, label.isNotEmpty() && label != "@SK_AUTO_ENTER")
+                .invoke(guide, index, label.isNotEmpty())
         }
         type.getMethod("invalidate").invoke(guide)
     }
