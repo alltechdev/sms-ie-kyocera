@@ -52,7 +52,13 @@ class KyoceraFilePicker : KyoceraActivity() {
         list = ListView(this)
         adapter = object : ArrayAdapter<Entry>(this, android.R.layout.simple_list_item_1, entries) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                if (getItem(position)?.id != "@name") return super.getView(position, null, parent)
+                if (getItem(position)?.id != "@name") return super.getView(position, null, parent).apply {
+                    (this as TextView).apply {
+                        isSingleLine = true
+                        ellipsize = TextUtils.TruncateAt.MARQUEE
+                        marqueeRepeatLimit = -1
+                    }
+                }
                 return layoutInflater.inflate(android.R.layout.simple_list_item_2, parent, false).apply {
                     findViewById<TextView>(android.R.id.text1).text = "File name"
                     findViewById<TextView>(android.R.id.text2).apply {

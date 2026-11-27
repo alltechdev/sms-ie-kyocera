@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.text.TextUtils
 import android.view.Window
 import android.widget.*
 import androidx.fragment.app.DialogFragment
@@ -136,6 +138,14 @@ class KyoceraMainUi(activity: KyoceraActivity) {
     val list = ListView(activity)
     private val actions = arrayListOf<NativeAction>()
     private val adapter = object : ArrayAdapter<NativeAction>(activity, android.R.layout.simple_list_item_1, actions) {
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
+            super.getView(position, convertView, parent).apply {
+                (this as TextView).apply {
+                    isSingleLine = true
+                    ellipsize = TextUtils.TruncateAt.MARQUEE
+                    marqueeRepeatLimit = -1
+                }
+            }
         override fun hasStableIds() = true
         override fun getItemId(position: Int) = actions[position].id.toLong()
         override fun areAllItemsEnabled() = false
