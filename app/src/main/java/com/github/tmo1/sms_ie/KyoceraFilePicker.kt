@@ -12,6 +12,8 @@ import android.os.Bundle
 import android.os.CancellationSignal
 import android.provider.DocumentsContract
 import android.view.View
+import android.view.ViewGroup
+import android.text.TextUtils
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -48,7 +50,19 @@ class KyoceraFilePicker : KyoceraActivity() {
         location = TextView(this).apply { textSize = 14f; setPadding(8, 4, 8, 4) }
         page.addView(location, LinearLayout.LayoutParams(-1, -2))
         list = ListView(this)
-        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, entries)
+        adapter = object : ArrayAdapter<Entry>(this, android.R.layout.simple_list_item_1, entries) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                if (getItem(position)?.id != "@name") return super.getView(position, null, parent)
+                return layoutInflater.inflate(android.R.layout.simple_list_item_2, parent, false).apply {
+                    findViewById<TextView>(android.R.id.text1).text = "File name"
+                    findViewById<TextView>(android.R.id.text2).apply {
+                        text = filename
+                        isSingleLine = true
+                        ellipsize = TextUtils.TruncateAt.MIDDLE
+                    }
+                }
+            }
+        }
         list.adapter = adapter
         list.setOnItemClickListener { _, _, position, _ -> select(entries[position]) }
         page.addView(list, LinearLayout.LayoutParams(-1, 0, 1f))
@@ -93,14 +107,14 @@ class KyoceraFilePicker : KyoceraActivity() {
     private fun display(ticket: Int, rows: List<Entry>, path: String) {
         if (ticket != generation || isFinishing || isDestroyed) return
         entries.clear()
-        if (create) entries.add(Entry("@name", "Name: $filename", false))
+        if (create && directory != null) entries.add(Entry("@name", "File name", false))
         entries.addAll(rows)
         adapter.notifyDataSetChanged()
         location.text = path
         busy = false
         list.isEnabled = true
         list.requestFocus()
-        list.setSelection(if (create && rows.isNotEmpty()) 1 else 0)
+        list.setSelection(0)
         refreshNativeSoftkeys()
     }
 
@@ -139,7 +153,7 @@ class KyoceraFilePicker : KyoceraActivity() {
                     }
                 }
                 rows.sortWith(compareBy<Entry> { !it.directory }.thenBy(String.CASE_INSENSITIVE_ORDER) { it.name })
-                runOnUiThread { display(ticket, rows, entry.id.replace(':', '/')) }
+                runOnUiThread { display(ticket, rows, entry.name) }
             } catch (error: Exception) { report(ticket, error) }
         }
     }
@@ -167,7 +181,7 @@ class KyoceraFilePicker : KyoceraActivity() {
                 } else {
                     filename = name
                     val index = entries.indexOfFirst { it.id == "@name" }
-                    if (index >= 0) entries[index] = Entry("@name", "Name: $filename", false)
+                    if (index >= 0) entries[index] = Entry("@name", "File name", false)
                     adapter.notifyDataSetChanged()
                     dialog.dismiss()
                 }
