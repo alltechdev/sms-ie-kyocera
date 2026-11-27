@@ -260,6 +260,11 @@ class SettingsActivity : KyoceraActivity() {
             prefs?.unregisterOnSharedPreferenceChangeListener(prefListener)
         }
 
+        override fun onActivityCreated(state: Bundle?) {
+            super.onActivityCreated(state)
+            (view?.findViewById<View>(android.R.id.list) as? android.widget.ListView)?.let { applyNativeListAppearance(it) }
+        }
+
         // from: https://old.black/2020/09/18/building-custom-timepicker-dialog-preference-in-android-kotlin/
         override fun onPreferenceTreeClick(screen: android.preference.PreferenceScreen, preference: Preference): Boolean {
             if (preference is android.preference.DialogPreference) {

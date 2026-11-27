@@ -49,7 +49,7 @@ class KyoceraFilePicker : KyoceraActivity() {
         val page = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         location = TextView(this).apply { textSize = 14f; setPadding(8, 4, 8, 4) }
         page.addView(location, LinearLayout.LayoutParams(-1, -2))
-        list = ListView(this)
+        list = ListView(this).also { applyNativeListAppearance(it) }
         adapter = object : ArrayAdapter<Entry>(this, android.R.layout.simple_list_item_1, entries) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 if (getItem(position)?.id != "@name") return super.getView(position, null, parent).apply {

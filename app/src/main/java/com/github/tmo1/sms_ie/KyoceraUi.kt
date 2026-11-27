@@ -124,6 +124,14 @@ fun bindNativeDialog(dialog: AlertDialog) {
     } catch (_: ReflectiveOperationException) { /* Standard Android keys remain functional. */ }
 }
 
+fun applyNativeListAppearance(list: ListView) {
+    val divider = list.resources.getIdentifier("fp_list_divider", "drawable", "android")
+    if (divider != 0) {
+        list.divider = list.context.getDrawable(divider)
+        list.dividerHeight = list.divider?.intrinsicHeight?.coerceAtLeast(1) ?: 1
+    }
+}
+
 class NativeAction(val id: Int, val label: String, private val changed: () -> Unit) {
     var isEnabled = true
         set(value) { if (field != value) { field = value; changed() } }
@@ -165,6 +173,7 @@ class KyoceraMainUi(activity: KyoceraActivity) {
             R.id.wipe_all_messages_button to R.string.wipe_messages,
         )
         labels.forEach { (id, label) -> actions.add(NativeAction(id, activity.getString(label)) { adapter.notifyDataSetChanged() }) }
+        applyNativeListAppearance(list)
         list.adapter = adapter
         list.setOnItemClickListener { _, view, position, _ -> actions[position].invoke(view) }
         root.addView(list, LinearLayout.LayoutParams(-1, 0, 1f))
