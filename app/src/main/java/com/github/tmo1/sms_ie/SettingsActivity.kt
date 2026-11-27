@@ -110,7 +110,8 @@ class SettingsActivity : KyoceraActivity() {
                 for (index in 0 until group.preferenceCount) {
                     val item = group.getPreference(index)
                     item.isIconSpaceReserved = false
-                    item.isSingleLineTitle = false
+                    if (item is TimePickerPreference) item.summary = minutesAfterMidnightToHourlyTime(requireContext(), item.getPersistedMinutesAfterMidnight())
+                    item.isSingleLineTitle = true
                     if (item is EditTextPreference) {
                         item.summary = item.text
                         item.setOnPreferenceChangeListener { _, value -> item.summary = value.toString(); true }

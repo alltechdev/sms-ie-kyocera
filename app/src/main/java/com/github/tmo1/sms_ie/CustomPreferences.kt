@@ -33,6 +33,11 @@ import java.util.Locale
 class TimePickerPreference(context: Context, attrs: AttributeSet?) :
     DialogPreference(context, attrs) {
 
+    init {
+        setPositiveButtonText(android.R.string.ok)
+        setNegativeButtonText(android.R.string.cancel)
+    }
+
     // Get saved preference value (in minutes from midnight, so 1 AM is represented as 1*60 here
     fun getPersistedMinutesAfterMidnight(): Int {
         return super.getPersistedInt(DEFAULT_MINUTES_AFTER_MIDNIGHT)
