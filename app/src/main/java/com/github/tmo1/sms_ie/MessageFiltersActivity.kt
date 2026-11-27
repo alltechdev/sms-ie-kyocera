@@ -28,6 +28,8 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.text.TextUtils
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -67,8 +69,18 @@ class MessageFiltersActivity : KyoceraActivity() {
         tapFilterToEditOrDelete.visibility = if (list.isEmpty()) View.GONE else View.VISIBLE
         // https://developer.android.com/develop/ui/views/layout/declaring-layout#AdapterViews
         val messageFiltersAdapter =
-            ArrayAdapter<MessageFilter>(this, android.R.layout.simple_list_item_1, list)
+            object : ArrayAdapter<MessageFilter>(this, android.R.layout.simple_list_item_1, list) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
+                    super.getView(position, convertView, parent).apply {
+                        (this as TextView).apply {
+                            isSingleLine = true
+                            ellipsize = TextUtils.TruncateAt.MARQUEE
+                            marqueeRepeatLimit = -1
+                        }
+                    }
+            }
         val messageFiltersList: ListView = findViewById(R.id.message_filters_list)
+        applyNativeListAppearance(messageFiltersList)
         messageFiltersList.adapter = messageFiltersAdapter
         fun updateMessageFilters() {
             messageFiltersAdapter.notifyDataSetChanged()
