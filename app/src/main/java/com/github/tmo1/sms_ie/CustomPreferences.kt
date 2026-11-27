@@ -25,7 +25,7 @@ package com.github.tmo1.sms_ie
 import android.content.Context
 import android.text.format.DateUtils
 import android.util.AttributeSet
-import androidx.preference.DialogPreference
+import android.preference.DialogPreference
 import java.util.Formatter
 import java.util.Locale
 
@@ -45,9 +45,26 @@ class TimePickerPreference(context: Context, attrs: AttributeSet?) :
         scheduleAutomaticExport(context, true)
     }
 
-    override fun onSetInitialValue(defaultValue: Any?) {
-        super.onSetInitialValue(defaultValue)
+    override fun onSetInitialValue(restorePersistedValue: Boolean, defaultValue: Any?) {
+        if (!restorePersistedValue) persistInt((defaultValue as? Int) ?: DEFAULT_MINUTES_AFTER_MIDNIGHT)
         summary = minutesAfterMidnightToHourlyTime(context, getPersistedMinutesAfterMidnight())
+    }
+
+    private lateinit var nativeTime: android.widget.TimePicker
+    override fun onCreateDialogView(): android.view.View {
+        nativeTime = android.widget.TimePicker(context)
+        val minutes = getPersistedMinutesAfterMidnight()
+        nativeTime.hour = minutes / 60
+        nativeTime.minute = minutes % 60
+        return nativeTime
+    }
+    override fun onDialogClosed(positiveResult: Boolean) {
+        super.onDialogClosed(positiveResult)
+        if (positiveResult) {
+            val minutes = nativeTime.hour * 60 + nativeTime.minute
+            persistMinutesAfterMidnight(minutes)
+            summary = minutesAfterMidnightToHourlyTime(context, minutes)
+        }
     }
 
     // Mostly for default values

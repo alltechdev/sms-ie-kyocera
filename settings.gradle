@@ -26,3 +26,4 @@ plugins {
 
 rootProject.name = "sms-ie"
 include ':app'
+include ':documents-broker'

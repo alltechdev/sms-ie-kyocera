@@ -42,7 +42,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
 import androidx.core.net.toUri
-import androidx.preference.PreferenceManager
+import android.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo

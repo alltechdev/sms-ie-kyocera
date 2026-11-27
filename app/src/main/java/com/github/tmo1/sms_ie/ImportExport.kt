@@ -40,7 +40,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
-import androidx.preference.PreferenceManager
+import android.preference.PreferenceManager
 import androidx.work.Data
 import androidx.work.workDataOf
 import kotlinx.coroutines.Dispatchers

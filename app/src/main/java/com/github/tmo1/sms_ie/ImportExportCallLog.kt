@@ -33,7 +33,7 @@ import android.util.JsonWriter
 import android.util.Log
 import android.util.MalformedJsonException
 import androidx.core.net.toUri
-import androidx.preference.PreferenceManager
+import android.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext

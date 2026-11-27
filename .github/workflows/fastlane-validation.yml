@@ -1,12 +1,8 @@
 name: fastlane-validation
 
 on:
-  push:
-    paths:
-      - 'fastlane/**'
-  pull_request:
-    paths:
-      - 'fastlane/**'
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest

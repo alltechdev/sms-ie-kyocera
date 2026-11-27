@@ -33,7 +33,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.core.content.edit
-import androidx.preference.PreferenceManager
+import android.preference.PreferenceManager
 import com.sun.jna.NativeLong
 import java.io.FilterInputStream
 import java.io.FilterOutputStream

@@ -18,97 +18,14 @@
   ~ along with SMS Import / Export.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:stretchColumns="1"
-    android:measureWithLargestChild="true"
-    android:paddingStart="?attr/dialogPreferredPadding"
-    android:paddingEnd="?attr/dialogPreferredPadding"
-    android:paddingTop="?attr/dialogPreferredPadding">
-
-    <TableRow
-        android:layout_weight="1"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/column_name" />
-
-        <FrameLayout
-            android:background="@drawable/view_border"
-            android:layout_margin="2dp">
-            <Spinner
-                android:id="@+id/message_column_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="36dp" />
-        </FrameLayout>
-    </TableRow>
-
-    <TableRow
-        android:layout_weight="1"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/operator" />
-
-        <FrameLayout
-            android:background="@drawable/view_border"
-            android:layout_margin="2dp">
-            <Spinner
-                android:id="@+id/operator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="36dp" />
-        </FrameLayout>
-    </TableRow>
-
-    <TableRow
-        android:layout_weight="1"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/column_value" />
-
-        <FrameLayout
-            android:background="@drawable/view_border"
-            android:layout_margin="2dp">
-            <!-- Intentionally styled to look like the spinners above. -->
-            <EditText
-                android:id="@+id/message_column_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:background="@null"
-                android:minHeight="36dp"
-                android:textSize="16sp"
-                android:hint="@string/value"
-                android:importantForAutofill="no"
-                android:inputType="text" />
-        </FrameLayout>
-    </TableRow>
-
-    <TableRow
-        android:layout_weight="1"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/active" />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/filter_active"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:checked="true" />
-    </TableRow>
-</TableLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content">
+ <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="8dp">
+  <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/column_name" android:textSize="14sp" />
+  <Spinner android:id="@+id/message_column_name" android:layout_width="match_parent" android:layout_height="wrap_content" />
+  <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/operator" android:textSize="14sp" />
+  <Spinner android:id="@+id/operator" android:layout_width="match_parent" android:layout_height="wrap_content" />
+  <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/column_value" android:textSize="14sp" />
+  <EditText android:id="@+id/message_column_value" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="16sp" android:hint="@string/value" android:importantForAutofill="no" android:inputType="text" android:singleLine="true" />
+  <Switch android:id="@+id/filter_active" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/active" android:checked="true" />
+ </LinearLayout>
+</ScrollView>

@@ -38,51 +38,28 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
-import androidx.preference.EditTextPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceGroup
-import androidx.preference.SwitchPreferenceCompat
-import androidx.recyclerview.widget.RecyclerView
+import android.preference.EditTextPreference
+import android.preference.Preference
+import android.preference.PreferenceFragment
+import android.preference.PreferenceGroup
+import android.preference.SwitchPreference
 
 const val REQUEST_EXPORT_FOLDER = 4
 const val EXPORT_DIR = "export_dir"
 const val DISABLE_BATTERY_OPTIMIZATIONS = "disable_battery_optimizations"
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : KyoceraActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().replace(R.id.settings, SettingsFragment())
+            fragmentManager.beginTransaction().replace(R.id.settings, SettingsFragment())
                 .commit()
         }
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.avoidObstructions { insets ->
-            // Shift the toolbar down using margins, but use padding for the sides. When the phone
-            // is in landscape and the phone has a notch, it looks nicer to have the bar's
-            // background extend horizontally fully.
-            updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = insets.top
-            }
-            updatePadding(
-                left = insets.left,
-                right = insets.right,
-            )
-        }
-
-        setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         //prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
@@ -98,26 +75,25 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    class SettingsFragment : PreferenceFragmentCompat() {
+    class SettingsFragment : PreferenceFragment() {
+        private fun requireContext(): android.content.Context = checkNotNull(activity)
 
         // https://stackoverflow.com/questions/70803830/updating-a-preference-summary-in-android-when-the-user-sets-it
         private val prefs by lazy { preferenceManager.sharedPreferences }
         private val targetDirPreference: Preference by lazy {
             findPreference(EXPORT_DIR) ?: error("Missing export directory preference!")
         }
-        private val disableBattOptPreference: SwitchPreferenceCompat by lazy {
-            findPreference(DISABLE_BATTERY_OPTIMIZATIONS)
+        private val disableBattOptPreference: SwitchPreference by lazy {
+            findNativePreference<SwitchPreference>(DISABLE_BATTERY_OPTIMIZATIONS)
                 ?: error("Missing disable battery optimizations preference!")
         }
-        private val requestDisableBattOpt =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                updateBatteryOptimizationState()
-            }
-        private val requestPostNotification = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            Log.d("Permission: ", if (isGranted) "Granted" else "Denied")
+        private val requestDisableBattOpt = object {
+            fun launch(intent: Intent) { startActivityForResult(intent, 105) }
         }
+        private val requestPostNotification = object {
+            fun launch(permission: String) { requestPermissions(arrayOf(permission), 106) }
+        }
+        private inline fun <reified T : Preference> findNativePreference(key: String): T? = findPreference(key) as? T
 
         // We need to store a reference to the preference change listener here (and not just inside
         // `onCreatePreferences()`) in order to prevent it from being garbage collected:
@@ -126,35 +102,28 @@ class SettingsActivity : AppCompatActivity() {
         // https://developer.android.com/reference/android/content/SharedPreferences.html#registerOnSharedPreferenceChangeListener(android.content.SharedPreferences.OnSharedPreferenceChangeListener)
         private lateinit var prefListener: SharedPreferences.OnSharedPreferenceChangeListener
 
-        override fun onCreateRecyclerView(
-            inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?
-        ): RecyclerView {
-            val view = super.onCreateRecyclerView(inflater, parent, savedInstanceState)
-
-            // Since we're edge-to-edge, preference options further down can be drawn under the
-            // translucent navigation bar. Make sure the RecyclerView leaves padding at the end so
-            // that the final setting is tappable when the user scrolls to the bottom.
-            view.clipToPadding = false
-
-            view.avoidObstructions { insets ->
-                updatePadding(
-                    bottom = insets.bottom,
-                    left = insets.left,
-                    right = insets.right,
-                )
-            }
-
-            return view
-        }
-
         @SuppressLint("BatteryLife")
-        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-            setPreferencesFromResource(R.xml.root_preferences, rootKey)
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            addPreferencesFromResource(R.xml.root_preferences)
+            fun nativeRows(group: PreferenceGroup) {
+                for (index in 0 until group.preferenceCount) {
+                    val item = group.getPreference(index)
+                    item.isIconSpaceReserved = false
+                    item.isSingleLineTitle = false
+                    if (item is EditTextPreference) {
+                        item.summary = item.text
+                        item.setOnPreferenceChangeListener { _, value -> item.summary = value.toString(); true }
+                    }
+                    if (item is PreferenceGroup) nativeRows(item)
+                }
+            }
+            nativeRows(preferenceScreen)
 
             // The LazySodium Android binding requires API level >= 21.
             // https://github.com/terl/lazysodium-android/blob/76e18548a0af285215f536c0d6d17369ac598311/app/build.gradle#L42
             if (SDK_INT < 21) {
-                val encryption = findPreference<PreferenceGroup>("encryption_preference_category")
+                val encryption = findNativePreference<PreferenceGroup>("encryption_preference_category")
                 encryption?.isEnabled = false
                 encryption?.summary = "Encryption requires API level >= 21"
             }
@@ -167,22 +136,19 @@ class SettingsActivity : AppCompatActivity() {
 
             if (SDK_INT < 23) {
                 val scheduledExport =
-                    findPreference<PreferenceGroup>("scheduled_export_preference_category")
+                    findNativePreference<PreferenceGroup>("scheduled_export_preference_category")
                 scheduledExport?.isEnabled = false
                 scheduledExport?.summary = "Scheduled export requires API level >= 23"
             } else {
                 targetDirPreference.setOnPreferenceClickListener {
-                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-                        //addCategory(Intent.CATEGORY_OPENABLE)
-                        //putExtra(DocumentsContract.EXTRA_INITIAL_URI, "")
-                    }
+                    val intent = KyoceraOpenTree().createIntent(requireContext(), null)
                     startActivityForResult(intent, REQUEST_EXPORT_FOLDER)
                     true
                 }
                 updateExportDirPreferenceSummary()
             }
 
-            findPreference<SwitchPreferenceCompat>("save_logcat")!!.summary =
+            findNativePreference<SwitchPreference>("save_logcat")!!.summary =
                 getString(R.string.pref_save_logcat_summary, logcatFile(requireContext()))
 
             if (SDK_INT >= Build.VERSION_CODES.M) {
@@ -229,7 +195,7 @@ class SettingsActivity : AppCompatActivity() {
                     }
 
                     "last_successful_scheduled_export", "next_scheduled_export" -> {
-                        val pref = findPreference<Preference>(key)
+                        val pref = findNativePreference<Preference>(key)
                         val prefs = prefs
                         prefs?.let {
                             val date = prefs.getLong(key, 0)
@@ -260,19 +226,17 @@ class SettingsActivity : AppCompatActivity() {
                 // https://developer.android.com/develop/ui/views/components/settings/use-saved-values#change-listener
                 it.registerOnSharedPreferenceChangeListener(prefListener)
 
-                var pref = findPreference<Preference>("last_successful_scheduled_export")
+                var pref = findNativePreference<Preference>("last_successful_scheduled_export")
                 var date = prefs.getLong("last_successful_scheduled_export", 0)
                 pref?.summary = if (date > 0) formatDate(requireContext(), date) else "<None>"
                 pref = findPreference("next_scheduled_export")
                 date = prefs.getLong("next_scheduled_export", 0)
                 pref?.summary = if (date > 0) formatDate(requireContext(), date) else "<None>"
 
-                findPreference<EditTextPreference>("export_interval_days")?.let {pref ->
+                findNativePreference<EditTextPreference>("export_interval_days")?.let {pref ->
 
-                    pref.setOnBindEditTextListener { editText ->
-                        editText.inputType = InputType.TYPE_CLASS_NUMBER
-                        editText.hint = "Enter a number >= 1"
-                    }
+                    pref.editText.inputType = InputType.TYPE_CLASS_NUMBER
+                    pref.editText.hint = "Enter a number >= 1"
 
                     // Ensure that export interval >= 1, since if it's 0 the app will go into an
                     // infinite loop of scheduling and running exports ...
@@ -280,7 +244,9 @@ class SettingsActivity : AppCompatActivity() {
                         val interval = (newValue as? String)?.toIntOrNull()
                         // 'True' means that the new value is accepted and 'False' means that it's
                         // rejected.
-                        interval != null && interval >= 1
+                        val valid = interval != null && interval >= 1
+                        if (valid) pref.summary = newValue.toString()
+                        valid
                     }
                 }
             }
@@ -294,25 +260,17 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // from: https://old.black/2020/09/18/building-custom-timepicker-dialog-preference-in-android-kotlin/
-        override fun onDisplayPreferenceDialog(preference: Preference) {
-            when (preference) {
-                is TimePickerPreference -> {
-                    if (SDK_INT >= 23) {
-                        val timePickerDialog = TimePreferenceDialog.newInstance(preference.key)
-                        timePickerDialog.setTargetFragment(this, 0)
-                        timePickerDialog.show(parentFragmentManager, "TimePickerDialog")
-                    }
-                }
-
-                else -> {
-                    super.onDisplayPreferenceDialog(preference)
-                }
+        override fun onPreferenceTreeClick(screen: android.preference.PreferenceScreen, preference: Preference): Boolean {
+            if (preference is android.preference.DialogPreference) {
+                view?.post { (preference.dialog as? android.app.AlertDialog)?.let { bindNativeDialog(it) } }
             }
+            return super.onPreferenceTreeClick(screen, preference)
         }
 
         @Deprecated("Deprecated in Java")
         override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
             super.onActivityResult(requestCode, resultCode, intent)
+            if (requestCode == 105) { updateBatteryOptimizationState(); return }
             // from: https://stackoverflow.com/questions/34331956/trying-to-takepersistableuripermission-fails-for-custom-documentsprovider-via
             if (requestCode == REQUEST_EXPORT_FOLDER && resultCode == RESULT_OK && intent != null) {
                 val treeUri = intent.data
@@ -366,7 +324,7 @@ class SettingsActivity : AppCompatActivity() {
                 val pm: PowerManager = context.getSystemService(POWER_SERVICE) as PowerManager
                 disableBattOptPreference.isChecked =
                     pm.isIgnoringBatteryOptimizations(context.packageName)
-            } else disableBattOptPreference.isVisible = false
+            } else disableBattOptPreference.isEnabled = false
         }
     }
 

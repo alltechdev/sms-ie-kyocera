@@ -24,16 +24,16 @@
     <item
         android:id="@+id/settings"
         android:title="@string/settings"
-        app:showAsAction="never" />
+        android:showAsAction="never" />
 
     <item
         android:id="@+id/message_filters"
         android:title="@string/message_filters"
-        app:showAsAction="never" />
+        android:showAsAction="never" />
 
     <item
         android:id="@+id/about"
         android:title="@string/about"
-        app:showAsAction="never" />
+        android:showAsAction="never" />
 
 </menu>

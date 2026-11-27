@@ -35,13 +35,11 @@ import android.widget.EditText
 import android.widget.ListView
 import android.widget.Spinner
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
+import android.app.AlertDialog
+import android.widget.Switch
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
-import androidx.preference.PreferenceManager
+import android.preference.PreferenceManager
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -53,10 +51,11 @@ import kotlin.time.Instant
 const val SMS = 0
 const val MMS = 1
 
-class MessageFiltersActivity : AppCompatActivity() {
+class MessageFiltersActivity : KyoceraActivity() {
+    override fun nativeRightLabel() = "Add"
+    override fun nativeRight() { AddEditDeleteMessageFilterFragment().show(supportFragmentManager, "add_message_filter") }
     val list = arrayListOf<MessageFilter>()
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         // https://developer.android.com/guide/fragments/communicate#fragment-result
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
@@ -112,7 +111,7 @@ class MessageFiltersActivity : AppCompatActivity() {
 }
 
 // https://developer.android.com/develop/ui/views/components/dialogs#CustomLayout
-class AddEditDeleteMessageFilterFragment : DialogFragment() {
+class AddEditDeleteMessageFilterFragment : KyoceraDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val position = arguments?.getInt("position")
@@ -125,7 +124,7 @@ class AddEditDeleteMessageFilterFragment : DialogFragment() {
             val messageColumnsSpinner: Spinner = view.findViewById(R.id.message_column_name)
             val operatorSpinner: Spinner = view.findViewById(R.id.operator)
             val messageColumnValue: EditText = view.findViewById(R.id.message_column_value)
-            val active: SwitchCompat = view.findViewById(R.id.filter_active)
+            val active: Switch = view.findViewById(R.id.filter_active)
             builder.setView(view).setPositiveButton(
                 "Save"
             ) { dialog, id ->
@@ -228,7 +227,7 @@ private fun getMessageFilters(prefs: SharedPreferences, list: ArrayList<MessageF
 fun messageSelection(appContext: Context, messageType: Int): String? {
     val prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
     val selection = if (prefs.getBoolean("message_filtering", false)) {
-        val list = arrayListOf<MessageFilter>()
+            val list = arrayListOf<MessageFilter>()
         getMessageFilters(prefs, list)
         list.filter {
             it.active && ((messageType == SMS && !it.column.startsWith("mms.")) || (messageType == MMS && !it.column.startsWith(

@@ -23,13 +23,10 @@ package com.github.tmo1.sms_ie
 import android.os.Bundle
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.updatePadding
 
-class AboutActivity : AppCompatActivity() {
+class AboutActivity : KyoceraActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
         val aboutText: TextView = findViewById(R.id.aboutText)

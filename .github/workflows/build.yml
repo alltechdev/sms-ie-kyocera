@@ -1,14 +1,8 @@
 name: build
 
 on:
-  push:
-    paths-ignore:
-      - 'fastlane/**'
-      - '**/*.md'
-  pull_request:
-    paths-ignore:
-      - 'fastlane/**'
-      - '**/*.md'
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest

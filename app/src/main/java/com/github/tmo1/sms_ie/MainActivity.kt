@@ -52,22 +52,18 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import android.app.AlertDialog
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
-import androidx.preference.PreferenceManager
+import android.preference.PreferenceManager
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import android.widget.EditText
 import com.goterl.lazysodium.LazySodiumAndroid
 import com.goterl.lazysodium.SodiumAndroid
 import java.text.SimpleDateFormat
@@ -96,8 +92,16 @@ private enum class PostSmsRoleAction {
 val sodium = if (SDK_INT >= 21) SodiumAndroid() else null
 val lazySodiumAndroid = LazySodiumAndroid(sodium)
 
-class MainActivity : AppCompatActivity(), ConfirmWipeFragment.NoticeDialogListener,
+class MainActivity : KyoceraActivity(), ConfirmWipeFragment.NoticeDialogListener,
     BecomeDefaultSMSAppFragment.NoticeDialogListener {
+    private lateinit var nativeUi: KyoceraMainUi
+    override fun nativeRightLabel() = "Options"
+    override fun nativeRight() { openOptionsMenu() }
+    override fun nativeLeftLabel() = if (findViewById<Button>(R.id.cancel_button)?.visibility == View.VISIBLE) "Cancel" else "Back"
+    override fun nativeLeft() {
+        val cancel = findViewById<Button>(R.id.cancel_button)
+        if (cancel?.visibility == View.VISIBLE) cancel.performClick() else super.nativeLeft()
+    }
     private lateinit var prefs: SharedPreferences
     private val requestPermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
@@ -106,26 +110,26 @@ class MainActivity : AppCompatActivity(), ConfirmWipeFragment.NoticeDialogListen
             // grant permissions.
         }
     private val requestExistingFile =
-        registerForActivityResult(ActivityResultContracts.OpenDocument()) { u ->
+        registerForActivityResult(KyoceraOpenDocument()) { u ->
             uri = u
             nullUriAllowed = false
             launchPendingAction()
         }
     private val requestNewJsonFile =
-        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { u ->
+        registerForActivityResult(KyoceraCreateDocument("application/json")) { u ->
             uri = u
             nullUriAllowed = false
             launchPendingAction()
         }
     private val requestNewZipFile =
-        registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { u ->
+        registerForActivityResult(KyoceraCreateDocument("application/zip")) { u ->
             uri = u
             nullUriAllowed = false
             launchPendingAction()
         }
 
     private val requestNewBinaryFile =
-        registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { u ->
+        registerForActivityResult(KyoceraCreateDocument("application/octet-stream")) { u ->
             uri = u
             nullUriAllowed = false
             launchPendingAction()
@@ -187,7 +191,6 @@ class MainActivity : AppCompatActivity(), ConfirmWipeFragment.NoticeDialogListen
         // done to prevent the app from shifting up. Edge-to-edge is required for
         // android:windowLightStatusBar in themes.xml to work so that light text isn't used on a
         // light status bar.
-        enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
 
@@ -218,41 +221,21 @@ class MainActivity : AppCompatActivity(), ConfirmWipeFragment.NoticeDialogListen
         )
 
         // set up UI
-        setContentView(R.layout.activity_main)
+        nativeUi = KyoceraMainUi(this)
+        setContentView(nativeUi.root)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.avoidObstructions { insets ->
-            // Shift the toolbar down using margins, but use padding for the sides. When the phone
-            // is in landscape and the phone has a notch, it looks nicer to have the bar's
-            // background extend horizontally fully.
-            updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = insets.top
-            }
-            updatePadding(
-                left = insets.left,
-                right = insets.right,
-            )
-        }
-        setSupportActionBar(toolbar)
 
-        findViewById<ScrollView>(R.id.main_content).avoidObstructions { insets ->
-            updatePadding(
-                left = insets.left,
-                right = insets.right,
-                bottom = insets.bottom,
-            )
-        }
 
-        val exportMessagesButton: Button = findViewById(R.id.export_messages_button)
-        val importMessagesButton: Button = findViewById(R.id.import_messages_button)
-        val exportCallLogButton: Button = findViewById(R.id.export_call_log_button)
-        val importCallLogButton: Button = findViewById(R.id.import_call_log_button)
-        val exportContactsButton: Button = findViewById(R.id.export_contacts_button)
-        val importContactsButton: Button = findViewById(R.id.import_contacts_button)
-        val exportBlockedNumbersButton: Button = findViewById(R.id.export_blocked_numbers_button)
-        val importBlockedNumbersButton: Button = findViewById(R.id.import_blocked_numbers_button)
-        val wipeAllMessagesButton: Button = findViewById(R.id.wipe_all_messages_button)
-        val countMessagesButton: Button = findViewById(R.id.count_messages_button)
+        val exportMessagesButton: NativeAction = nativeUi.action(R.id.export_messages_button)
+        val importMessagesButton: NativeAction = nativeUi.action(R.id.import_messages_button)
+        val exportCallLogButton: NativeAction = nativeUi.action(R.id.export_call_log_button)
+        val importCallLogButton: NativeAction = nativeUi.action(R.id.import_call_log_button)
+        val exportContactsButton: NativeAction = nativeUi.action(R.id.export_contacts_button)
+        val importContactsButton: NativeAction = nativeUi.action(R.id.import_contacts_button)
+        val exportBlockedNumbersButton: NativeAction = nativeUi.action(R.id.export_blocked_numbers_button)
+        val importBlockedNumbersButton: NativeAction = nativeUi.action(R.id.import_blocked_numbers_button)
+        val wipeAllMessagesButton: NativeAction = nativeUi.action(R.id.wipe_all_messages_button)
+        val countMessagesButton: NativeAction = nativeUi.action(R.id.count_messages_button)
         val setDefaultSMSAppButton: Button = findViewById(R.id.set_default_sms_app_button)
         val statusReportText: TextView = findViewById(R.id.status_report)
         val progressBar: ProgressBar = findViewById(R.id.progressBar)
@@ -393,8 +376,8 @@ class MainActivity : AppCompatActivity(), ConfirmWipeFragment.NoticeDialogListen
                 }
             }
 
-            progressBar.visibility = if (isRunning) View.VISIBLE else View.INVISIBLE
-            cancelButton.visibility = if (canCancel) View.VISIBLE else View.INVISIBLE
+            progressBar.visibility = if (isRunning) View.VISIBLE else View.GONE
+            cancelButton.visibility = if (canCancel) View.VISIBLE else View.GONE
 
             // Although ImportExportWorker uses a unique work ID to guarantee that multiple
             // operations won't run at the same time, we should still try to prevent the user
@@ -410,8 +393,9 @@ class MainActivity : AppCompatActivity(), ConfirmWipeFragment.NoticeDialogListen
                 importBlockedNumbersButton,
                 wipeAllMessagesButton,
                 countMessagesButton,
-                setDefaultSMSAppButton
             ).forEach { button -> button.isEnabled = !isRunning }
+            setDefaultSMSAppButton.isEnabled = !isRunning
+            refreshNativeSoftkeys()
         })
     }
 
@@ -676,7 +660,7 @@ class MainActivity : AppCompatActivity(), ConfirmWipeFragment.NoticeDialogListen
     }
 }
 
-class ErrorMessageFragment : DialogFragment() {
+class ErrorMessageFragment : KyoceraDialogFragment() {
     companion object {
         fun newInstance(title: String, message: String, savedLogcat: Boolean) =
             ErrorMessageFragment().apply {
@@ -725,7 +709,7 @@ class ErrorMessageFragment : DialogFragment() {
 
 // https://developer.android.com/guide/topics/ui/dialogs
 // https://developer.android.com/guide/fragments/dialogs
-class ConfirmWipeFragment : DialogFragment() {
+class ConfirmWipeFragment : KyoceraDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
@@ -773,7 +757,7 @@ class ConfirmWipeFragment : DialogFragment() {
     }
 }
 
-class BecomeDefaultSMSAppFragment : DialogFragment() {
+class BecomeDefaultSMSAppFragment : KyoceraDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
@@ -803,7 +787,7 @@ class BecomeDefaultSMSAppFragment : DialogFragment() {
     }
 }
 
-class GeneralErrorDialogFragment : DialogFragment() {
+class GeneralErrorDialogFragment : KyoceraDialogFragment() {
     companion object {
         const val TAG = "GeneralErrorDialogFragment"
         const val MESSAGE_KEY = "message"
@@ -826,34 +810,25 @@ class GeneralErrorDialogFragment : DialogFragment() {
     }
 }
 
-class PassphraseEntryFragment : DialogFragment() {
+class PassphraseEntryFragment : KyoceraDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            val textInputLayout = TextInputLayout(it).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                hint = "Passphrase"
-                endIconMode = TextInputLayout.END_ICON_PASSWORD_TOGGLE
-                val textInputEditText = TextInputEditText(context).apply {
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    transformationMethod = PasswordTransformationMethod.getInstance()
-                }
-                addView(textInputEditText)
+            val editor = EditText(it).apply {
+                hint = getString(R.string.kyocera_passphrase_hint)
+                inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+                transformationMethod = PasswordTransformationMethod.getInstance()
+                isSingleLine = true
             }
             val builder = AlertDialog.Builder(it)
             builder.setTitle("Enter encryption passphrase")
-                .setIcon(android.R.drawable.ic_dialog_info).setView(textInputLayout)
+                .setIcon(android.R.drawable.ic_dialog_info).setView(editor)
                 .setPositiveButton(
                     R.string.okay
                 ) { dialog, id ->
                     setFragmentResult(
                         "setPassphrase", Bundle().apply {
                             putString(
-                                "passphrase", textInputLayout.editText?.text.toString().trim()
+                                "passphrase", editor.text.toString().trim()
                             )
                         })
                 }

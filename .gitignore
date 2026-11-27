@@ -29,3 +29,7 @@ local.properties
 /app/release
 /app/legacy
 /app/standard
+
+**/build/
+
+/.kotlin/

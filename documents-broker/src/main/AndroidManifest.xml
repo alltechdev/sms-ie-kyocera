@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    <application android:label="Kyocera document access" android:allowBackup="false">
+        <!-- No launcher or picker intent filter. This is only a signature-
+             protected service for the authorized client. -->
+        <provider android:name=".DocumentAccessProvider"
+            android:authorities="com.atd.kyocera.documents"
+            android:exported="true" android:grantUriPermissions="true"
+            android:permission="com.github.tmo1.sms_ie.permission.DOCUMENTS" />
+    </application>
+</manifest>

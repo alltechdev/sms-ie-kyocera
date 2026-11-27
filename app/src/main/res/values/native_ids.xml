@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="cancel_button" />
+    <item type="id" name="count_messages_button" />
+    <item type="id" name="default_sms_app_warning" />
+    <item type="id" name="export_blocked_numbers_button" />
+    <item type="id" name="export_call_log_button" />
+    <item type="id" name="export_contacts_button" />
+    <item type="id" name="export_messages_button" />
+    <item type="id" name="guideline" />
+    <item type="id" name="import_blocked_numbers_button" />
+    <item type="id" name="import_call_log_button" />
+    <item type="id" name="import_contacts_button" />
+    <item type="id" name="import_messages_button" />
+    <item type="id" name="main_content" />
+    <item type="id" name="progressBar" />
+    <item type="id" name="set_default_sms_app_button" />
+    <item type="id" name="status_report" />
+    <item type="id" name="toolbar" />
+    <item type="id" name="wipe_all_messages_button" />
+</resources>
