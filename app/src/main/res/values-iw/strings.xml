@@ -25,7 +25,7 @@
     <string name="homepage">דף הבית:</string>
     <string name="documentation">תיעוד:</string>
     <string name="import_contacts">ייבוא אנשי קשר</string>
-    <string name="app_name">ייבוא/ייצוא של SMS</string>
+    <string name="app_name">SMSIE</string>
     <string name="export_messages_button_label">ייצוא הודעות</string>
     <string name="import_messages_button_label">ייבאו הודעות</string>
     <string name="import_call_log_button_label">ייבוא יומן שיחות</string>

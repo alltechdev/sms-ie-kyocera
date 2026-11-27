@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">എസ്എംഎസ് ഇറക്കുമതി / കയറ്റുമതി</string>
+    <string name="app_name">SMSIE</string>
     <string name="export_messages_button_label">സന്ദേശങ്ങൾ കയറ്റുമതി ചെയ്യുക</string>
     <string name="ready">തയ്യാറാണ്</string>
     <string name="call_log_import_progress">%1$d വിളി(കൾ) ഇറക്കുമതി ചെയ്തു</string>

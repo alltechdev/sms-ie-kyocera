@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Importar / Exportar SMS</string>
+    <string name="app_name">SMSIE</string>
     <string name="export_messages_button_label">Exportar Mensagens</string>
     <string name="import_messages_button_label">Importar Mensagens</string>
     <string name="export_call_log_button_label">Exportar Registro de Chamadas</string>

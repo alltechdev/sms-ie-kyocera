@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="call_log_export_progress">%1$d de %2$d llamada(s) exportada(s)</string>
-    <string name="app_name">SMS Import / Export</string>
+    <string name="app_name">SMSIE</string>
     <string name="export_messages_button_label">Exportar mensajes</string>
     <string name="import_messages_button_label">Importar mensajes</string>
     <string name="export_call_log_button_label">Exportar el registro de llamadas</string>

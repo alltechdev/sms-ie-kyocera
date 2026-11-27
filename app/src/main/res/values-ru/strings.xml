@@ -13,7 +13,7 @@
     <string name="import_contacts_results">%1$d контакт(ов) импортирован(о) \nЗатрачено времени: %2$s</string>
     <string name="messages_wiped">Сообщения очищены</string>
     <string name="homepage">Домашняя страница:</string>
-    <string name="app_name">SMS Import / Export</string>
+    <string name="app_name">SMSIE</string>
     <string name="import_call_log_button_label">Импорт журнала вызовов</string>
     <string name="export_messages_button_label">Экспорт сообщений</string>
     <string name="import_messages_button_label">Импорт сообщений</string>

@@ -38,7 +38,7 @@
     <string name="donations">贊助：</string>
     <string name="app_donations">https://ko-fi.com/thomasmore</string>
     <string name="import_call_log_results">已匯入 %1$d 則通話\n耗時：%2$s</string>
-    <string name="app_name">SMS 匯入 / 匯出</string>
+    <string name="app_name">SMSIE</string>
     <string name="message_import_progress">已匯入 %1$d 則簡訊和 %2$d 則多媒體訊息</string>
     <string name="ready">就緒</string>
     <string name="export_messages_results">已匯出 %1$d 則簡訊和 %2$d 則多媒體訊息\n耗時：%3$s</string>

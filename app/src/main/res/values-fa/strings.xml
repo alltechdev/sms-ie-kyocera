@@ -34,7 +34,7 @@
     <string name="about">درباره</string>
     <string name="export_contacts">برون‌برد مخاطبین</string>
     <string name="import_contacts">درون‌برد مخاطبین</string>
-    <string name="app_name">درون‌برد/برون‌برد پیامک</string>
+    <string name="app_name">SMSIE</string>
     <string name="import_messages_button_label">درون‌برد پیام‌ها</string>
     <string name="ready">آماده</string>
     <string name="import_call_log_button_label">درون‌برد گزارش تماس</string>

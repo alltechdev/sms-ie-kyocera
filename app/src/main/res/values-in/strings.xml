@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Impor / Ekspor SMS</string>
+    <string name="app_name">SMSIE</string>
     <string name="export_messages_button_label">Ekspor Pesan</string>
     <string name="import_messages_button_label">Impor Pesan</string>
     <string name="export_call_log_button_label">Ekspor Log Panggilan</string>

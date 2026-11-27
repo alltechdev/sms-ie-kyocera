@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SMS-import/eksport</string>
+    <string name="app_name">SMSIE</string>
     <string name="import_call_log_button_label">Importer anropslogg</string>
     <string name="ready">Klar</string>
     <string name="call_log_import_progress">%1$d samtale(r) importert</string>

@@ -20,7 +20,7 @@
   ~ Vous devriez avoir reçu une copie de la Licence publique générale GNU
   ~ avec SMS Import / Export. Autrement, consultez <https://www.gnu.org/licenses/>.
   --><resources>
-    <string name="app_name">SMS Import / Export</string>
+    <string name="app_name">SMSIE</string>
     <string name="export_messages_button_label">Exporter les messages</string>
     <string name="import_messages_button_label">Importer les messages</string>
     <string name="export_call_log_button_label">Exporter l\'historique des appels</string>

@@ -25,7 +25,7 @@
     <string name="documentation">说明文档：</string>
     <string name="issue_tracker">问题反馈：</string>
     <string name="about">关于</string>
-    <string name="app_name">短信导入/导出</string>
+    <string name="app_name">SMSIE</string>
     <string name="import_call_log_button_label">导入通话记录</string>
     <string name="call_log_export_progress">共 %2$d 条通话记录，导出了 %1$d 条</string>
     <string name="export_call_log_results">导出了 %1$d 条通话记录

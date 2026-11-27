@@ -18,7 +18,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with SMS Import / Export.  If not, see <https://www.gnu.org/licenses/>.
   --><resources>
-    <string name="app_name">SMS Import / Export</string>
+    <string name="app_name">SMSIE</string>
     <string name="export_messages_button_label">Exportiere Nachrichten</string>
     <string name="import_messages_button_label">Importiere Nachrichten</string>
     <string name="export_call_log_button_label">Anrufliste exportieren</string>

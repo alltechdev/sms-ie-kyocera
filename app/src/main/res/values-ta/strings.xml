@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">எச்எம்எச் இறக்குமதி / ஏற்றுமதி</string>
+    <string name="app_name">SMSIE</string>
     <string name="export_messages_button_label">செய்திகளை ஏற்றுமதி செய்யுங்கள்</string>
     <string name="import_messages_button_label">செய்திகளை இறக்குமதி செய்யுங்கள்</string>
     <string name="export_call_log_button_label">அழைப்பு பதிவு ஏற்றுமதி</string>

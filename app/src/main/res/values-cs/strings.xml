@@ -9,7 +9,7 @@
     <string name="export_call_log_button_label">Exportovat seznam hovorů</string>
     <string name="import_call_log_button_label">Importovat seznam hovorů</string>
     <string name="message_import_progress">%1$d SMS a %2$d MMS importováno</string>
-    <string name="app_name">SMS Import / Export</string>
+    <string name="app_name">SMSIE</string>
     <string name="export_messages_button_label">Exportovat zprávy</string>
     <string name="call_log_export_progress">%1$d z %2$d záznamů exportováno</string>
     <string name="import_messages_button_label">Importovat zprávy</string>

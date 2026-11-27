@@ -50,7 +50,7 @@
     <string name="message_import_api_23_requirement">Import af beskeder er kun muligt på Android Marshmallow / 6.0 (API-niveau 23) eller nyere.</string>
     <string name="set_default_sms_app">Indstil standardbeskedapp</string>
     <string name="importing_calls">Importerer opkald…</string>
-    <string name="app_name">SMS Import / Eksport</string>
+    <string name="app_name">SMSIE</string>
     <string name="import_messages_button_label">Importér beskeder</string>
     <string name="call_log_export_progress">%1$d af %2$d opkald eksporteret</string>
     <string name="call_log_import_progress">%1$d opkald importeret</string>
