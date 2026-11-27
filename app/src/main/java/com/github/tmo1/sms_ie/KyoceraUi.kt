@@ -36,12 +36,12 @@ class KyoceraSoftkeys(window: Window, center: () -> Unit, left: () -> Unit, righ
             type.getMethod("setSoftkeyEventListener", Int::class.javaPrimitiveType, listener).invoke(guide, index, proxy)
         }
     }
-    fun labels(center: String, left: String, right: String) {
+    fun labels(center: String, left: String, right: String, priority: Int = 2) {
         listOf(center, left, right).forEachIndexed { index, label ->
             val listener = Class.forName("jp.kyocera.kcfp.util.KCfpSoftkeyGuide\$SoftkeyEventListener")
             type.getMethod("setSoftkeyEventListener", Int::class.javaPrimitiveType, listener)
                 .invoke(guide, index, if (label == "@SK_AUTO_ENTER" || label.isEmpty()) null else listeners[index])
-            type.getMethod("setPriority", Int::class.javaPrimitiveType, Int::class.javaPrimitiveType).invoke(guide, index, 2)
+            type.getMethod("setPriority", Int::class.javaPrimitiveType, Int::class.javaPrimitiveType).invoke(guide, index, if (label.isEmpty()) 0 else priority)
             type.getMethod("setText", Int::class.javaPrimitiveType, CharSequence::class.java).invoke(guide, index, label)
             type.getMethod("setEnabled", Int::class.javaPrimitiveType, Boolean::class.javaPrimitiveType)
                 .invoke(guide, index, label.isNotEmpty())
@@ -108,21 +108,26 @@ open class KyoceraDialogFragment : DialogFragment() {
 
 fun bindNativeDialog(dialog: AlertDialog) {
     try {
+        fun positive() = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        fun cancel() {
+            val negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            if (!negative?.text.isNullOrEmpty()) negative.performClick() else dialog.cancel()
+        }
         val guide = KyoceraSoftkeys(dialog.window!!, {
             val focus = dialog.currentFocus
-            if (focus is ListView && focus.selectedItemPosition >= 0)
+            if (focus is EditText) positive()?.performClick()
+            else if (focus is ListView && focus.selectedItemPosition >= 0)
                 focus.performItemClick(focus.selectedView, focus.selectedItemPosition, focus.selectedItemId)
-            else if (focus !is EditText) focus?.performClick()
-        }, {
-            val negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            if (negative?.visibility == View.VISIBLE) negative.performClick() else dialog.cancel()
-        }, {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.performClick()
+            else focus?.performClick()
+        }, { cancel() }, {
+            if (dialog.currentFocus is EditText) cancel() else positive()?.performClick()
         })
         fun refresh() {
-            val positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            guide.labels(if (dialog.currentFocus is EditText) "@SK_AUTO_ENTER" else "Select", "Cancel",
-                if (positive?.visibility == View.VISIBLE) positive.text.toString() else "")
+            val editing = dialog.currentFocus is EditText
+            val label = positive()?.text?.toString().orEmpty()
+            guide.labels(if (editing) label.ifEmpty { "OK" } else "Select",
+                if (editing) "" else "Cancel", if (editing) "Cancel" else label,
+                if (editing) 4 else 3)
         }
         dialog.window!!.decorView.viewTreeObserver.addOnGlobalFocusChangeListener { _, _ -> refresh() }
         refresh()
