@@ -109,6 +109,16 @@ open class KyoceraDialogFragment : DialogFragment() {
 fun bindNativeDialog(dialog: AlertDialog) {
     try {
         fun positive() = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        fun hasSecondaryAction() = !dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.text.isNullOrEmpty()
+        fun showActions() {
+            val actions = listOfNotNull(positive(), dialog.getButton(AlertDialog.BUTTON_NEUTRAL))
+                .filter { !it.text.isNullOrEmpty() && it.isEnabled }
+            val menu = AlertDialog.Builder(dialog.context).setTitle("Options")
+                .setItems(actions.map { it.text.toString() }.toTypedArray()) { _, position -> actions[position].performClick() }
+                .create()
+            menu.setOnShowListener { bindNativeDialog(menu) }
+            menu.show()
+        }
         fun cancel() {
             val negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
             if (!negative?.text.isNullOrEmpty()) negative.performClick() else dialog.cancel()
@@ -120,13 +130,15 @@ fun bindNativeDialog(dialog: AlertDialog) {
                 focus.performItemClick(focus.selectedView, focus.selectedItemPosition, focus.selectedItemId)
             else focus?.performClick()
         }, { cancel() }, {
-            if (dialog.currentFocus is EditText) cancel() else positive()?.performClick()
+            if (dialog.currentFocus is EditText) cancel()
+            else if (hasSecondaryAction()) showActions()
+            else positive()?.performClick()
         })
         fun refresh() {
             val editing = dialog.currentFocus is EditText
             val label = positive()?.text?.toString().orEmpty()
             guide.labels(if (editing) label.ifEmpty { "OK" } else "Select",
-                if (editing) "" else "Cancel", if (editing) "Cancel" else label,
+                if (editing) "" else "Cancel", if (editing) "Cancel" else if (hasSecondaryAction()) "Options" else label,
                 if (editing) 4 else 3)
         }
         dialog.window!!.decorView.viewTreeObserver.addOnGlobalFocusChangeListener { _, _ -> refresh() }
