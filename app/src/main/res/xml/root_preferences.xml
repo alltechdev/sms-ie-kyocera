@@ -28,7 +28,7 @@
         <SwitchPreference android:defaultValue="false" android:key="encryption_manual_operations" android:title="@string/pref_encryption_manual_operations_title" android:singleLineTitle="true" />
         <SwitchPreference android:key="encryption_stored_passphrase_manual_operations" android:title="@string/pref_encryption_stored_passphrase_manual_operations_title" android:defaultValue="false" android:singleLineTitle="true" android:dependency="encryption_manual_operations" />
         <SwitchPreference android:key="encryption_scheduled_operations" android:title="@string/pref_encryption_scheduled_operations_title" android:defaultValue="false" android:singleLineTitle="true" />
-        <Preference android:key="encryption_store_passphrase" android:widgetLayout="@layout/store_passphrase" />
+        <Preference android:key="encryption_store_passphrase" android:title="@string/encryption_store_passphrase" />
     </PreferenceCategory>
     <PreferenceCategory android:key="scheduled_export_preference_category" android:title="@string/pref_header_scheduled_export">
         <Preference android:key="last_successful_scheduled_export" android:title="@string/pref_last_successful_scheduled_export_title" android:dependency="schedule_export" />

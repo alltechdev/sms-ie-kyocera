@@ -819,9 +819,21 @@ class PassphraseEntryFragment : KyoceraDialogFragment() {
                 transformationMethod = PasswordTransformationMethod.getInstance()
                 isSingleLine = true
             }
+            val content = android.widget.LinearLayout(it).apply {
+                orientation = android.widget.LinearLayout.VERTICAL
+                addView(editor)
+                addView(android.widget.CheckBox(it).apply {
+                    setText(R.string.kyocera_show_passphrase)
+                    setOnCheckedChangeListener { _, checked ->
+                        val selection = editor.selectionEnd
+                        editor.transformationMethod = if (checked) null else PasswordTransformationMethod.getInstance()
+                        if (selection >= 0) editor.setSelection(selection)
+                    }
+                })
+            }
             val builder = AlertDialog.Builder(it)
-            builder.setTitle("Enter encryption passphrase")
-                .setIcon(android.R.drawable.ic_dialog_info).setView(editor)
+            builder.setTitle(R.string.kyocera_passphrase_hint)
+                .setView(content).setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(
                     R.string.okay
                 ) { dialog, id ->

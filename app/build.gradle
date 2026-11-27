@@ -35,8 +35,8 @@ android {
         applicationId "com.github.tmo1.sms_ie"
         minSdkVersion 28
         targetSdkVersion 29
-        versionCode 10126
-        versionName "2.13.0-kyocera5"
+        versionCode 10127
+        versionName "2.13.0-kyocera6"
         base.archivesName = applicationId + '-v' + versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

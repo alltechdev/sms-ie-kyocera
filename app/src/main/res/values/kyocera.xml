@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="kyocera_passphrase_hint">Passphrase</string>
+    <string name="kyocera_show_passphrase">Show passphrase</string>
     <style name="Theme.SmsieKyocera" parent="android:style/Theme.DeviceDefault.Light" />
 </resources>

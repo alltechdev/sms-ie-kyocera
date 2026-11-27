@@ -120,6 +120,10 @@ class SettingsActivity : KyoceraActivity() {
                 }
             }
             nativeRows(preferenceScreen)
+            findNativePreference<Preference>("encryption_store_passphrase")!!.setOnPreferenceClickListener {
+                (activity as SettingsActivity).showPassphraseDialog()
+                true
+            }
 
             // The LazySodium Android binding requires API level >= 21.
             // https://github.com/terl/lazysodium-android/blob/76e18548a0af285215f536c0d6d17369ac598311/app/build.gradle#L42
@@ -334,7 +338,7 @@ class SettingsActivity : KyoceraActivity() {
         }
     }
 
-    fun onPassphraseButtonClick(view: View) {
+    fun showPassphraseDialog() {
         PassphraseEntryFragment().show(supportFragmentManager, "passphrase_entry")
     }
 
